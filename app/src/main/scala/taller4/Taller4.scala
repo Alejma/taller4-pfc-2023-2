@@ -290,7 +290,8 @@ object Taller4{
     println("\nResultado (Multiplicación de Matrices - recursiva paralela):")
     multMatrizRecPar(matriz1, matriz2).foreach(row => println(row.mkString(" ")))
 
-
+    println("\nResultado Resta de Matrices:")
+    restaMatriz(matriz1,matriz2).foreach(row => println(row.mkString(" ")))
 
     println("\nResultado (Multiplicación de Matrices - strassen secuencial):")
     multStrassen(matriz1, matriz2).foreach(row => println(row.mkString(" ")))
@@ -308,11 +309,11 @@ object Taller4{
     println(compararAlgoritmos(multMatrizRec,multMatrizRecPar)(matrizAlAzar(32,8),matrizAlAzar(32,8)))
     println(compararAlgoritmos(mulMatriz,multMatrizParalelo)(matrizAlAzar(32,8),matrizAlAzar(32,8)))
 
-    for {
+/*    for {
       i <- 1 to 10
       m1 = matrizAlAzar(math.pow(2, i).toInt, 2)
       m2 = matrizAlAzar(math.pow(2, i).toInt, 2)
-    } yield (println(compararAlgoritmos(multMatrizRec, multMatrizRecPar)(m1, m2), math.pow(2, i).toInt))
+    } yield (println(compararAlgoritmos(multMatrizRec, multMatrizRecPar)(m1, m2), math.pow(2, i).toInt))*/
 
 
 
