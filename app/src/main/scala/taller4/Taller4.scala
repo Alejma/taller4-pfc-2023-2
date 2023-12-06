@@ -280,7 +280,7 @@ object Taller4 {
 
   def main(args: Array[String]): Unit = {
     // Pruebas
-    val dimensiones = Seq(2, 4, 8, 16, 32, 64, 128, 256, 512, 1024)
+/*    val dimensiones = Seq(2, 4, 8, 16, 32, 64, 128, 256, 512, 1024)
     println("Comparativa entre multMatrizRec y multMatrizRecPar:")
     println("| Dimension | multMatrizRec | multMatrizRecPar | Aceleración |")
     println("|-----------|----------------|------------------|-------------|")
@@ -293,6 +293,9 @@ object Taller4 {
         compararAlgoritmos(multMatrizRec, multMatrizRecPar)(matriz1, matriz2)
 
       println(s"|     $dim     |   $tiempoMultMatrizRec   |      $tiempoMultMatrizRecPar       |    $aceleracion    |")
-    }
+    }*/
+
+
+    //mulMatriz(matriz4, matriz5).foreach(row => println(row.mkString(" ")))
   }
 }
