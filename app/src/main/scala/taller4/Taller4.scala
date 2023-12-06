@@ -10,9 +10,10 @@ import org.scalameter.withWarmer
 import org.scalameter.Warmer
 import common._
 import scala.util.Random
-object Taller4{
+object Taller4 {
   type Matriz = Vector[Vector[Int]]
-  def matrizAlAzar(long: Int, vals: Int): Matriz =  {
+
+  def matrizAlAzar(long: Int, vals: Int): Matriz = {
 
     val random = new Random()
     val v = Vector.fill(long, long)(random.nextInt(vals))
@@ -30,20 +31,24 @@ object Taller4{
     val tiempo1: Double = tiempoFuncion1.value
     val tiempo2: Double = tiempoFuncion2.value
     val aceleracion = tiempo1 / tiempo2
-    (tiempo1, tiempo2,aceleracion)
+    (tiempo1, tiempo2, aceleracion)
   }
-  def prodPunto(v1:Vector[Int],v2:Vector[Int]):Int = {
-    (v1 zip v2).map({case (i,j)=>i*j}).sum
+
+  def prodPunto(v1: Vector[Int], v2: Vector[Int]): Int = {
+    (v1 zip v2).map({ case (i, j) => i * j }).sum
   }
-  def transpuesta (m:Matriz):Matriz = {
-    val l=m.length
-    Vector.tabulate(l,l)((i,j)=>m(j)(i))
+
+  def transpuesta(m: Matriz): Matriz = {
+    val l = m.length
+    Vector.tabulate(l, l)((i, j) => m(j)(i))
   }
-  def mulMatriz(m1:Matriz,m2:Matriz):Matriz = {
+
+  def mulMatriz(m1: Matriz, m2: Matriz): Matriz = {
     val m2t = transpuesta(m2)
     val l = m1.length
-    Vector.tabulate(l,l)((i,j)=>prodPunto(m1(i),m2t(j)))
+    Vector.tabulate(l, l)((i, j) => prodPunto(m1(i), m2t(j)))
   }
+
   // usando task multiplicar matrices de froma parallela
   def multMatrizParalelo(m1: Matriz, m2: Matriz): Matriz = {
     val m2t = transpuesta(m2)
@@ -58,12 +63,14 @@ object Taller4{
   def subMatriz(m: Matriz, i: Int, j: Int, l: Int): Matriz = {
     Vector.tabulate(l, l)((f, c) => m(i + f)(j + c))
   }
+
   def sumMatriz(m1: Matriz, m2: Matriz): Matriz = {
     val n = m1.length
     Vector.tabulate(n, n) { (i, j) =>
       m1(i)(j) + m2(i)(j)
     }
   }
+
   def multMatrizRec(m1: Matriz, m2: Matriz): Matriz = {
     val n = m1.length
 
@@ -101,6 +108,7 @@ object Taller4{
       }
     }
   }
+
   //paralizar recursion
   def multMatrizRecPar(m1: Matriz, m2: Matriz): Matriz = {
     val n = m1.length
@@ -125,7 +133,7 @@ object Taller4{
       val b22 = subMatriz(m2, m, m, m)
 
       // Calcula las submatrices intermedias
-      val (c11,c12,c21,c22)= parallel(sumMatriz(multMatrizRecPar(a11, b11), multMatrizRecPar(a12, b21)),
+      val (c11, c12, c21, c22) = parallel(sumMatriz(multMatrizRecPar(a11, b11), multMatrizRecPar(a12, b21)),
         sumMatriz(multMatrizRecPar(a11, b12), multMatrizRecPar(a12, b22)),
         sumMatriz(multMatrizRecPar(a21, b11), multMatrizRecPar(a22, b21)),
         sumMatriz(multMatrizRecPar(a21, b12), multMatrizRecPar(a22, b22)))
@@ -146,10 +154,10 @@ object Taller4{
     }
   }
 
-  def restaMatriz(m1:Matriz, m2:Matriz):Matriz = {
+  def restaMatriz(m1: Matriz, m2: Matriz): Matriz = {
     val n = m1.length
-    Vector.tabulate(n,n){(i,j)=>
-      m1(i)(j)-m2(i)(j)
+    Vector.tabulate(n, n) { (i, j) =>
+      m1(i)(j) - m2(i)(j)
     }
   }
 
@@ -194,6 +202,7 @@ object Taller4{
       }
     }
   }
+
   def multStrassenPar(m1: Matriz, m2: Matriz): Matriz = {
 
     val n = m1.head.count(_ => true)
@@ -203,28 +212,58 @@ object Taller4{
     } else {
       val m = n / 2
 
-      val a11 = task{subMatriz(m1, 0, 0, m)}
-      val a12 = task{subMatriz(m1, 0, m, m)}
-      val a21 = task{subMatriz(m1, m, 0, m)}
-      val a22 = task{subMatriz(m1, m, m, m)}
+      val a11 = task {
+        subMatriz(m1, 0, 0, m)
+      }
+      val a12 = task {
+        subMatriz(m1, 0, m, m)
+      }
+      val a21 = task {
+        subMatriz(m1, m, 0, m)
+      }
+      val a22 = task {
+        subMatriz(m1, m, m, m)
+      }
 
-      val b11 = task{subMatriz(m2, 0, 0, m)}
-      val b12 = task{subMatriz(m2, 0, m, m)}
-      val b21 = task{subMatriz(m2, m, 0, m)}
-      val b22 = task{subMatriz(m2, m, m, m)}
+      val b11 = task {
+        subMatriz(m2, 0, 0, m)
+      }
+      val b12 = task {
+        subMatriz(m2, 0, m, m)
+      }
+      val b21 = task {
+        subMatriz(m2, m, 0, m)
+      }
+      val b22 = task {
+        subMatriz(m2, m, m, m)
+      }
 
 
-      val p1 = task{multStrassenPar(sumMatriz(a11.join, a22.join), sumMatriz(b11.join, b22.join))}
-      val p2 = task{multStrassenPar(sumMatriz(a21.join, a22.join), b11.join)}
-      val p3 = task{multStrassenPar(a11.join, restaMatriz(b12.join, b22.join))}
-      val p4 = task{multStrassenPar(a22.join, restaMatriz(b21.join, b11.join))}
-      val p5 = task{multStrassenPar(sumMatriz(a11.join, a12.join), b22.join)}
-      val p6 = task{multStrassenPar(restaMatriz(a21.join, a11.join), sumMatriz(b11.join, b12.join))}
-      val p7 = task{multStrassenPar(restaMatriz(a12.join, a22.join), sumMatriz(b21.join, b22.join))}
+      val p1 = task {
+        multStrassenPar(sumMatriz(a11.join, a22.join), sumMatriz(b11.join, b22.join))
+      }
+      val p2 = task {
+        multStrassenPar(sumMatriz(a21.join, a22.join), b11.join)
+      }
+      val p3 = task {
+        multStrassenPar(a11.join, restaMatriz(b12.join, b22.join))
+      }
+      val p4 = task {
+        multStrassenPar(a22.join, restaMatriz(b21.join, b11.join))
+      }
+      val p5 = task {
+        multStrassenPar(sumMatriz(a11.join, a12.join), b22.join)
+      }
+      val p6 = task {
+        multStrassenPar(restaMatriz(a21.join, a11.join), sumMatriz(b11.join, b12.join))
+      }
+      val p7 = task {
+        multStrassenPar(restaMatriz(a12.join, a22.join), sumMatriz(b21.join, b22.join))
+      }
 
-      val c11 =  restaMatriz(sumMatriz(sumMatriz(p1.join, p4.join), p7.join), p5.join)
-      val c12 =  sumMatriz(p3.join, p5.join)
-      val c21 =  sumMatriz(p2.join, p4.join)
+      val c11 = restaMatriz(sumMatriz(sumMatriz(p1.join, p4.join), p7.join), p5.join)
+      val c12 = sumMatriz(p3.join, p5.join)
+      val c21 = sumMatriz(p2.join, p4.join)
       val c22 = restaMatriz(sumMatriz(sumMatriz(p1.join, p3.join), p6.join), p2.join)
 
 
@@ -238,86 +277,22 @@ object Taller4{
       }
     }
   }
+
   def main(args: Array[String]): Unit = {
+    // Pruebas
+    val dimensiones = Seq(2, 4, 8, 16, 32, 64, 128, 256, 512, 1024)
+    println("Comparativa entre multMatrizRec y multMatrizRecPar:")
+    println("| Dimension | multMatrizRec | multMatrizRecPar | Aceleración |")
+    println("|-----------|----------------|------------------|-------------|")
 
-    val matriz1: Matriz = Vector(
-      Vector(1, 2, 3, 4),
-      Vector(5, 6, 7, 8),
-      Vector(9, 10, 11, 12),
-      Vector(13, 14, 15, 16)
-    )
+    for (dim <- dimensiones) {
+      val matriz1 = matrizAlAzar(dim, 100)
+      val matriz2 = matrizAlAzar(dim, 100)
 
-    val matriz2: Matriz = Vector(
-      Vector(17, 18, 19, 20),
-      Vector(21, 22, 23, 24),
-      Vector(25, 26, 27, 28),
-      Vector(29, 30, 31, 32)
-    )
+      val (tiempoMultMatrizRec, tiempoMultMatrizRecPar, aceleracion) =
+        compararAlgoritmos(multMatrizRec, multMatrizRecPar)(matriz1, matriz2)
 
-
-
-    println("\nResultado (Multiplicación de Matrices - Secuencial):")
-    mulMatriz(matriz1, matriz2).foreach(row => println(row.mkString(" ")))
-
-
-
-    // Mostrar el resultado de la multiplicación de matrices
-
-    println("\nResultado (Multiplicación de Matrices - paralela):")
-    multMatrizParalelo(matriz1, matriz2 ).foreach(row => println(row.mkString(" ")))
-
-
-    val submatrizA11 = subMatriz(matriz1, 0, 0, matriz1.length / 2)
-    val submatrizA22 = subMatriz(matriz1, (matriz1.length / 2)-1, (matriz1.length / 2)-1, 3)
-
-    println("Submatriz A11:")
-    submatrizA11.foreach(row => println(row.mkString(" ")))
-
-    println("\nSubmatriz A22:")
-    submatrizA22.foreach(row => println(row.mkString(" ")))
-
-
-    println("\nResultado (SUMA de Matrices - secuencial):")
-    sumMatriz(matriz1, matriz2).foreach(row => println(row.mkString(" ")))
-
-
-
-    println("\nResultado (Multiplicación de Matrices - recursiva secuencial):")
-    multMatrizRec(matriz1, matriz2).foreach(row => println(row.mkString(" ")))
-
-
-
-    println("\nResultado (Multiplicación de Matrices - recursiva paralela):")
-    multMatrizRecPar(matriz1, matriz2).foreach(row => println(row.mkString(" ")))
-
-    println("\nResultado Resta de Matrices:")
-    restaMatriz(matriz1,matriz2).foreach(row => println(row.mkString(" ")))
-
-    println("\nResultado (Multiplicación de Matrices - strassen secuencial):")
-    multStrassen(matriz1, matriz2).foreach(row => println(row.mkString(" ")))
-
-
-
-    println("\nResultado (Multiplicación de Matrices - strassen paralela):")
-    multStrassenPar(matriz1, matriz2).foreach(row => println(row.mkString(" ")))
-
-    //comparar algoritmos
-
-    println(compararAlgoritmos(multMatrizRec,multMatrizRecPar)(matriz1,matriz2))
-
-    println(compararAlgoritmos(multStrassen,multStrassenPar)(matrizAlAzar(32,8),matrizAlAzar(32,8)))
-    println(compararAlgoritmos(multMatrizRec,multMatrizRecPar)(matrizAlAzar(32,8),matrizAlAzar(32,8)))
-    println(compararAlgoritmos(mulMatriz,multMatrizParalelo)(matrizAlAzar(32,8),matrizAlAzar(32,8)))
-
-/*    for {
-      i <- 1 to 10
-      m1 = matrizAlAzar(math.pow(2, i).toInt, 2)
-      m2 = matrizAlAzar(math.pow(2, i).toInt, 2)
-    } yield (println(compararAlgoritmos(multMatrizRec, multMatrizRecPar)(m1, m2), math.pow(2, i).toInt))*/
-
-
-
-
-
+      println(s"|     $dim     |   $tiempoMultMatrizRec   |      $tiempoMultMatrizRecPar       |    $aceleracion    |")
+    }
   }
 }
