@@ -13,6 +13,7 @@ import scala.util.Random
 object Taller4 {
   type Matriz = Vector[Vector[Int]]
 
+  // Funcion que crea una matriz de dimensiones long x long con valores aleatorios entre 0 y vals
   def matrizAlAzar(long: Int, vals: Int): Matriz = {
 
     val random = new Random()
@@ -20,6 +21,7 @@ object Taller4 {
     v
   }
 
+  // Funcion que compara dos algoritmos y devuelve el tiempo de ejecucion de cada uno y la aceleracion
   def compararAlgoritmos(funcion1: (Matriz, Matriz) => Matriz, funcion2: (Matriz, Matriz) => Matriz)
                         (matriz1: Matriz, matriz2: Matriz): (Double, Double, Double) = {
     val tiempoFuncion1 = withWarmer(new Warmer.Default) measure {
@@ -49,7 +51,7 @@ object Taller4 {
     Vector.tabulate(l, l)((i, j) => prodPunto(m1(i), m2t(j)))
   }
 
-  // usando task multiplicar matrices de froma parallela
+  // Usando task multiplicar matrices de forma paralela
   def multMatrizParalelo(m1: Matriz, m2: Matriz): Matriz = {
     val m2t = transpuesta(m2)
     val (m1a, m1b) = m1.splitAt(m1.length / 2)
@@ -60,10 +62,12 @@ object Taller4 {
     top.join() ++ bot.join()
   }
 
+  // Funcion que obtiene la submatriz de una matriz
   def subMatriz(m: Matriz, i: Int, j: Int, l: Int): Matriz = {
     Vector.tabulate(l, l)((f, c) => m(i + f)(j + c))
   }
 
+  // Funcion que suma dos matrices
   def sumMatriz(m1: Matriz, m2: Matriz): Matriz = {
     val n = m1.length
     Vector.tabulate(n, n) { (i, j) =>
@@ -71,6 +75,7 @@ object Taller4 {
     }
   }
 
+  // Funcion que multiplica dos matrices usando el algoritmo de divide y conquista
   def multMatrizRec(m1: Matriz, m2: Matriz): Matriz = {
     val n = m1.length
 
@@ -109,7 +114,7 @@ object Taller4 {
     }
   }
 
-  //paralizar recursion
+  //Recuersion paralela
   def multMatrizRecPar(m1: Matriz, m2: Matriz): Matriz = {
     val n = m1.length
 
@@ -148,12 +153,14 @@ object Taller4 {
     }
   }
 
+  // Otra funcion de sumar matrices para pruebas
   def sumarMatrices(m1: Matriz, m2: Matriz): Matriz = {
     Vector.tabulate(m1.size, m1.head.size) { (i, j) =>
       m1(i)(j) + m2(i)(j)
     }
   }
 
+  // Funcion que resta dos matrices
   def restaMatriz(m1: Matriz, m2: Matriz): Matriz = {
     val n = m1.length
     Vector.tabulate(n, n) { (i, j) =>
@@ -161,6 +168,7 @@ object Taller4 {
     }
   }
 
+  // Funcion que multiplica dos matrices usando el algoritmo de Strassen
   def multStrassen(m1: Matriz, m2: Matriz): Matriz = {
 
     val n = m1.head.count(_ => true)
@@ -203,6 +211,7 @@ object Taller4 {
     }
   }
 
+  // Funcion que multiplica dos matrices usando el algoritmo de Strassen de forma paralela
   def multStrassenPar(m1: Matriz, m2: Matriz): Matriz = {
 
     val n = m1.head.count(_ => true)
@@ -279,7 +288,7 @@ object Taller4 {
   }
 
   def main(args: Array[String]): Unit = {
-    // Pruebas
+    // Pruebas para comparacion de algoritmos
 /*    val dimensiones = Seq(2, 4, 8, 16, 32, 64, 128, 256, 512, 1024)
     println("Comparativa entre multMatrizRec y multMatrizRecPar:")
     println("| Dimension | multMatrizRec | multMatrizRecPar | Aceleración |")
